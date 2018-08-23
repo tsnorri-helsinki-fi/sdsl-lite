@@ -153,7 +153,7 @@ inline excess::impl excess::data;
  *  \par Space complexity
  *       \f$ \Order{2n + min(block\_size, \frac{n}{block\_size} )\cdot \log n } \f$
  */
-inline bit_vector calculate_pioneers_bitmap(const bit_vector& bp, uint64_t block_size) 
+extern inline bit_vector calculate_pioneers_bitmap(const bit_vector& bp, uint64_t block_size)
 {
 	bit_vector pioneer_bitmap(bp.size(), 0);
 
@@ -201,7 +201,7 @@ inline bit_vector calculate_pioneers_bitmap(const bit_vector& bp, uint64_t block
  *       output, and \f$n\f$ bits for a succinct stack.
  *  \pre The parentheses sequence represented by bp has to be balanced.
  */
-inline bit_vector calculate_pioneers_bitmap_succinct(const bit_vector& bp, uint64_t block_size)
+extern inline bit_vector calculate_pioneers_bitmap_succinct(const bit_vector& bp, uint64_t block_size)
 {
 	bit_vector pioneer_bitmap(bp.size(), 0);
 
@@ -310,7 +310,7 @@ void calculate_enclose(const bit_vector& bp, int_vector& enclose)
 	assert(opening_parenthesis.empty());
 }
 
-inline uint64_t near_find_close(const bit_vector& bp, const uint64_t i, const uint64_t block_size)
+extern inline uint64_t near_find_close(const bit_vector& bp, const uint64_t i, const uint64_t block_size)
 {
 	typedef bit_vector::difference_type difference_type;
 	difference_type						excess = 1;
@@ -355,7 +355,7 @@ inline uint64_t near_find_close(const bit_vector& bp, const uint64_t i, const ui
 }
     
 
-inline uint64_t
+extern inline uint64_t
 near_find_closing(const bit_vector& bp, uint64_t i, uint64_t closings, const uint64_t block_size)
 {
 	typedef bit_vector::difference_type difference_type;
@@ -400,7 +400,7 @@ near_find_closing(const bit_vector& bp, uint64_t i, uint64_t closings, const uin
 	return i - 1;
 }
 
-inline
+extern inline
 uint64_t near_fwd_excess(const bit_vector&			 bp,
 						 uint64_t					 i,
 						 bit_vector::difference_type rel,
@@ -446,7 +446,7 @@ uint64_t near_fwd_excess(const bit_vector&			 bp,
  *	\param r  The right border of the interval.
  *  \param min_rel_ex Reference to the relative minimal excess value with regards to excess(bp[l])
  */
-inline uint64_t
+extern inline uint64_t
 near_rmq(const bit_vector& bp, uint64_t l, uint64_t r, bit_vector::difference_type& min_rel_ex)
 {
 	typedef bit_vector::difference_type difference_type;
@@ -494,7 +494,7 @@ near_rmq(const bit_vector& bp, uint64_t l, uint64_t r, bit_vector::difference_ty
 /* This method searches the maximal parenthesis j, with \f$ j\leq i \f$,
  * such that \f$ excess(j) = excess(i+1)+rel \f$ and i < bp.size()-1
  */
-inline
+extern inline
 uint64_t near_bwd_excess(const bit_vector&			 bp,
 						 uint64_t					 i,
 						 bit_vector::difference_type rel,
@@ -539,7 +539,7 @@ uint64_t near_bwd_excess(const bit_vector&			 bp,
 	return i + 1;
 }
 
-inline uint64_t near_find_open(const bit_vector& bp, uint64_t i, const uint64_t block_size)
+extern inline uint64_t near_find_open(const bit_vector& bp, uint64_t i, const uint64_t block_size)
 {
 	typedef bit_vector::difference_type difference_type;
 	difference_type						excess = -1;
@@ -578,7 +578,7 @@ inline uint64_t near_find_open(const bit_vector& bp, uint64_t i, const uint64_t 
 	return i;
 }
 
-inline
+extern inline
 uint64_t near_find_opening(const bit_vector& bp,
 						   uint64_t			 i,
 						   const uint64_t	openings,
@@ -632,7 +632,7 @@ uint64_t near_find_opening(const bit_vector& bp,
  * \pre We assert that \f$ bp[i]=1 \f$
  */
 // TODO: implement a fast version using lookup-tables of size 8
-inline uint64_t near_enclose(const bit_vector& bp, uint64_t i, const uint64_t block_size)
+extern inline uint64_t near_enclose(const bit_vector& bp, uint64_t i, const uint64_t block_size)
 {
 	uint64_t opening_parentheses = 1;
 	for (uint64_t j = i; j + block_size - 1 > i and j > 0; --j) {
@@ -647,7 +647,7 @@ inline uint64_t near_enclose(const bit_vector& bp, uint64_t i, const uint64_t bl
 	return i;
 }
 
-inline uint64_t near_rmq_open(const bit_vector& bp, const uint64_t begin, const uint64_t end)
+extern inline uint64_t near_rmq_open(const bit_vector& bp, const uint64_t begin, const uint64_t end)
 {
 	typedef bit_vector::difference_type difference_type;
 	difference_type						min_excess = end - begin + 1, ex = 0;
