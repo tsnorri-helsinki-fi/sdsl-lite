@@ -16,9 +16,9 @@
 
 namespace sdsl {
 
-// This structure contains lookup tables
-struct excess {
-	static struct impl {
+namespace excess {
+	// This structure contains lookup tables
+	struct impl {
 		// Given an excess value x in [-8,8] and a 8-bit
 		// word w interpreted as parentheses sequence.
 		// near_fwd_pos[(x+8)<<8 | w] contains the minimal position
@@ -139,10 +139,14 @@ struct excess {
 				(min_excess_of_open) | (min_excess_of_open_pos << 8) | (ones << 12);
 			}
 		}
-	} data;
+	};
+	
+	extern inline const impl data;
 };
 
-inline excess::impl excess::data;
+
+excess::impl const excess::data;
+
 
 //! Calculate pioneers as defined in the paper of Geary et al. (CPM 2004)
 /*! \param bp             The balanced parentheses sequence.
