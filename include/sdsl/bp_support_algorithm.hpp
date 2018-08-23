@@ -142,7 +142,7 @@ struct excess {
 	} data;
 };
 
-excess::impl excess::data;
+inline excess::impl excess::data;
 
 //! Calculate pioneers as defined in the paper of Geary et al. (CPM 2004)
 /*! \param bp             The balanced parentheses sequence.
