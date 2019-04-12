@@ -337,13 +337,13 @@ extern inline uint64_t near_find_close(const bit_vector& bp, const uint64_t i, c
 		if (excess_v <= 8) {
 			assert(excess_v > 0);
 			uint32_t x =
-			excess<>::data.min_match_pos_packed[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
+			excess::data.min_match_pos_packed[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
 			uint8_t p = (x >> ((excess_v - 1) << 2)) & 0xF;
 			if (p < 9) {
 				return j + p;
 			}
 		}
-		excess_v += excess<>::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
+		excess_v += excess::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
 	}
 	for (uint64_t j = std::max(l, r); j < end; ++j) {
 		if (bp[j])
@@ -382,13 +382,13 @@ near_find_closing(const bit_vector& bp, uint64_t i, uint64_t closings, const uin
 	for (uint64_t j = l; j < r; j += 8) {
 		if (excess_v - succ_excess <= 8) {
 			uint32_t x =
-			excess<>::data.min_match_pos_packed[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
+			excess::data.min_match_pos_packed[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
 			uint8_t p = (x >> (((excess_v - succ_excess) - 1) << 2)) & 0xF;
 			if (p < 9) {
 				return j + p;
 			}
 		}
-		excess_v += excess<>::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
+		excess_v += excess::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
 	}
 	for (uint64_t j = std::max(l, r); j < end; ++j) {
 		if (bp[j])
@@ -426,12 +426,12 @@ uint64_t near_fwd_excess(const bit_vector&			 bp,
 	for (uint64_t j = l; j < r; j += 8) {
 		if (excess_v >= 0 and excess_v <= 16) {
 			uint32_t x =
-			excess<>::data.near_fwd_pos[(excess_v << 8) + (((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF)];
+			excess::data.near_fwd_pos[(excess_v << 8) + (((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF)];
 			if (x < 8) {
 				return j + x;
 			}
 		}
-		excess_v -= excess<>::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
+		excess_v -= excess::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
 	}
 	excess_v -= 8;
 	for (uint64_t j = std::max(l, r); j < end; ++j) {
@@ -472,12 +472,12 @@ near_rmq(const bit_vector& bp, uint64_t l, uint64_t r, bit_vector::difference_ty
 
 	const uint64_t* b = bp.data();
 	for (uint64_t j = l8; j < r8; j += 8) {
-		int8_t x = excess<>::data.min[(((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF)];
+		int8_t x = excess::data.min[(((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF)];
 		if ((excess_v + x) <= min_rel_ex) {
 			min_rel_ex = excess_v + x;
-			min_pos	= j + excess<>::data.min_pos_max[(((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF)];
+			min_pos	= j + excess::data.min_pos_max[(((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF)];
 		}
-		excess_v += excess<>::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
+		excess_v += excess::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
 	}
 	for (uint64_t j = std::max(l8, r8); j < r + 1; ++j) {
 		if (bp[j])
@@ -521,12 +521,12 @@ uint64_t near_bwd_excess(const bit_vector&			 bp,
 	for (difference_type j = r - 8; j >= l; j -= 8) {
 		if (excess_v >= 0 and excess_v <= 16) {
 			uint32_t x =
-			excess<>::data.near_bwd_pos[(excess_v << 8) + (((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF)];
+			excess::data.near_bwd_pos[(excess_v << 8) + (((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF)];
 			if (x < 8) {
 				return j + x - 1;
 			}
 		}
-		excess_v += excess<>::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
+		excess_v += excess::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
 	}
 	excess_v -= 8;
 	for (difference_type j = std::min(l, r); j > begin; --j) {
@@ -562,13 +562,13 @@ extern inline uint64_t near_find_open(const bit_vector& bp, uint64_t i, const ui
 		if (excess_v >= -8) {
 			assert(excess_v < 0);
 			uint32_t x =
-			excess<>::data.max_match_pos_packed[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
+			excess::data.max_match_pos_packed[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
 			uint8_t p = (x >> ((-excess_v - 1) << 2)) & 0xF;
 			if (p < 9) {
 				return j + p;
 			}
 		}
-		excess_v += excess<>::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
+		excess_v += excess::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
 	}
 	for (difference_type j = std::min(l, r) - 1; j >= begin; --j) {
 		if (bp[j]) {
@@ -607,13 +607,13 @@ uint64_t near_find_opening(const bit_vector& bp,
 		if (succ_excess - excess_v <= 8) {
 			assert(succ_excess - excess_v > 0);
 			uint32_t x =
-			excess<>::data.max_match_pos_packed[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
+			excess::data.max_match_pos_packed[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
 			uint8_t p = (x >> ((succ_excess - excess_v - 1) << 2)) & 0xF;
 			if (p < 9) {
 				return j + p;
 			}
 		}
-		excess_v += excess<>::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
+		excess_v += excess::data.word_sum[((*(b + (j >> 6))) >> (j & 0x3F)) & 0xFF];
 	}
 	for (difference_type j = std::min(l, r) - 1; j >= begin; --j) {
 		if (bp[j]) {
@@ -672,7 +672,7 @@ extern inline uint64_t near_rmq_open(const bit_vector& bp, const uint64_t begin,
 	}
 	const uint64_t* b = bp.data();
 	for (uint64_t k = l; k < r; k += 8) {
-		uint16_t x	= excess<>::data.min_open_excess_info[((*(b + (k >> 6))) >> (k & 0x3F)) & 0xFF];
+		uint16_t x	= excess::data.min_open_excess_info[((*(b + (k >> 6))) >> (k & 0x3F)) & 0xFF];
 		int8_t   ones = (x >> 12);
 		if (ones) {
 			int8_t min_ex = (x & 0xFF) - 8;
