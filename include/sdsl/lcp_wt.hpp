@@ -8,7 +8,6 @@
 #ifndef INCLUDED_SDSL_LCP_WT
 #define INCLUDED_SDSL_LCP_WT
 
-#include "lcp.hpp"
 #include "wt_huff.hpp"
 #include "int_vector.hpp"
 #include "iterators.hpp"
@@ -158,6 +157,32 @@ public:
 	{
 		m_small_lcp.load(in);
 		m_big_lcp.load(in);
+	}
+
+	template <typename archive_t>
+	void CEREAL_SAVE_FUNCTION_NAME(archive_t & ar) const
+	{
+		ar(CEREAL_NVP(m_small_lcp));
+		ar(CEREAL_NVP(m_big_lcp));
+	}
+
+	template <typename archive_t>
+	void CEREAL_LOAD_FUNCTION_NAME(archive_t & ar)
+	{
+		ar(CEREAL_NVP(m_small_lcp));
+		ar(CEREAL_NVP(m_big_lcp));
+	}
+
+	//! Equality operator.
+	bool operator==(lcp_wt const & other) const noexcept
+	{
+		return (m_small_lcp == other.m_small_lcp) && (m_big_lcp == other.m_big_lcp);
+	}
+
+	//! Inequality operator.
+	bool operator!=(lcp_wt const & other) const noexcept
+	{
+		return !(*this == other);
 	}
 };
 

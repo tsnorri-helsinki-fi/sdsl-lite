@@ -21,12 +21,12 @@ class search_bidirectional_test : public ::testing::Test { };
 using testing::Types;
 
 typedef Types<
-csa_wt<wt_blcd<>, 32, 32, sa_order_sa_sampling<>, isa_sampling<>, byte_alphabet>,
-       csa_wt<wt_blcd<>, 32, 32, sa_order_sa_sampling<>, isa_sampling<>, succinct_byte_alphabet<> >,
-       csa_wt<wt_hutu<>, 32, 32, sa_order_sa_sampling<>, isa_sampling<>, byte_alphabet>,
-       csa_wt<wt_hutu<>, 32, 32, sa_order_sa_sampling<>, isa_sampling<>, succinct_byte_alphabet<> >,
-       csa_wt<wt_hutu<bit_vector_il<> >, 32, 32, sa_order_sa_sampling<>, isa_sampling<>, byte_alphabet>
-       > Implementations;
+    csa_wt<wt_blcd<>, 32, 32, sa_order_sa_sampling<>, isa_sampling<>, byte_alphabet>,
+    csa_wt<wt_blcd<>, 32, 32, sa_order_sa_sampling<>, isa_sampling<>, succinct_byte_alphabet<> >,
+    csa_wt<wt_hutu<>, 32, 32, sa_order_sa_sampling<>, isa_sampling<>, byte_alphabet>,
+    csa_wt<wt_hutu<>, 32, 32, sa_order_sa_sampling<>, isa_sampling<>, succinct_byte_alphabet<> >,
+    csa_wt<wt_hutu<bit_vector_il<> >, 32, 32, sa_order_sa_sampling<>, isa_sampling<>, byte_alphabet>
+> Implementations;
 
 TYPED_TEST_CASE(search_bidirectional_test, Implementations);
 
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
         return 1;
     }
     test_file = argv[1];
-    test_file_rev = test_file + "_rev";
+    test_file_rev = test_file + "_" + std::to_string(util::pid()) + "_rev";
 
     {
         //reverse input

@@ -266,6 +266,53 @@ public:
 		m_depth.load(in);
 	}
 
+	template <typename archive_t>
+	void CEREAL_SAVE_FUNCTION_NAME(archive_t & ar) const
+	{
+		ar(CEREAL_NVP(m_delta));
+		ar(CEREAL_NVP(m_nodes));
+		ar(CEREAL_NVP(m_csa));
+		ar(CEREAL_NVP(m_s));
+		ar(CEREAL_NVP(m_s_support));
+		ar(CEREAL_NVP(m_b));
+		ar(CEREAL_NVP(m_b_select0));
+		ar(CEREAL_NVP(m_b_select1));
+		ar(CEREAL_NVP(m_depth));
+	}
+
+	template <typename archive_t>
+	void CEREAL_LOAD_FUNCTION_NAME(archive_t & ar)
+	{
+		ar(CEREAL_NVP(m_delta));
+		ar(CEREAL_NVP(m_nodes));
+		ar(CEREAL_NVP(m_csa));
+		ar(CEREAL_NVP(m_s));
+		ar(CEREAL_NVP(m_s_support));
+		m_s_support.set_vector(&m_s);
+		ar(CEREAL_NVP(m_b));
+		ar(CEREAL_NVP(m_b_select0));
+		m_b_select0.set_vector(&m_b);
+		ar(CEREAL_NVP(m_b_select1));
+		m_b_select1.set_vector(&m_b);
+		ar(CEREAL_NVP(m_depth));
+	}
+
+	//! Equality operator.
+	bool operator==(cst_fully const & other) const noexcept
+	{
+		return (m_delta == other.m_delta) && (m_nodes == other.m_nodes) &&
+		       (m_csa == other.m_csa) && (m_s == other.m_s) &&
+		       (m_s_support == other.m_s_support) && (m_b == other.m_b) &&
+		       (m_b_select0 == other.m_b_select0) && (m_b_select1 == other.m_b_select1) &&
+		       (m_depth == other.m_depth);
+	}
+
+	//! Inequality operator.
+	bool operator!=(cst_fully const & other) const noexcept
+	{
+		return !(*this == other);
+	}
+
 	//! Returns the root of the suffix tree.
 	node_type root() const { return node_type(0, m_csa.size() - 1); }
 
@@ -854,7 +901,8 @@ cache_config& config)
 
 	m_s.resize(2 * sample_count);
 	util::set_to_value(m_s, 0);
-	bit_vector	 tmp_b(2 * sample_count + cst.size(), 0);
+	// increase size of tmp_b resp. m_b by two if text is empty
+	bit_vector	 tmp_b(2 * sample_count + cst.size() + 2 * (cst.size() == 1), 0);
 	int_vector<64> tmp_depth;
 	tmp_depth.resize(sample_count);
 
@@ -895,13 +943,5 @@ cache_config& config)
 }
 
 } // end namespace sdsl
-
-// TODO: make dependent on cst_fully
-template <class T>
-std::ostream& operator<<(std::ostream& os, const std::pair<T, T>& v)
-{
-	os << "[" << v.first << ", " << v.second << "]";
-	return os;
-}
 
 #endif // INCLUDED_SDSL_CST_FULLY

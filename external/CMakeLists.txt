@@ -3,22 +3,6 @@ if(NOT GIT_FOUND)
     message(WARNING "git not found. Cloning of submodules will not work.")
 endif()
 
-
-## Add libdivsufsort
-set(divsufsort_cmake_file ${CMAKE_CURRENT_LIST_DIR}/libdivsufsort/CMakeLists.txt)
-if(NOT EXISTS ${divsufsort_cmake_file})
-    EXECUTE_PROCESS(COMMAND git submodule update --init external/libdivsufsort
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/..
-                    OUTPUT_QUIET
-            )
-endif(NOT EXISTS ${divsufsort_cmake_file})
-
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Do not build a shared library for libdivsufsort")
-set(BUILD_EXAMPLES OFF CACHE BOOL "Do not build libdivsufsort example")
-set(BUILD_DIVSUFSORT64 ON CACHE BOOL "Build libdivsufsort in 64-bits mode")
-
-add_subdirectory(libdivsufsort)
-
 ## Add gtest 
 set(gtest_dir ${CMAKE_CURRENT_LIST_DIR}/googletest)
 set(gtest_file ${gtest_dir}/CMakeLists.txt)
@@ -31,4 +15,24 @@ endif(NOT EXISTS ${gtest_file})
 
 add_subdirectory(googletest EXCLUDE_FROM_ALL)
 
-   
+## Add cereal
+if(SDSL_CEREAL)
+	MESSAGE(STATUS "Adding cereal")
+	set(cereal_dir ${CMAKE_CURRENT_LIST_DIR}/cereal/include/cereal)
+	set(cereal_file ${cereal_dir}/cereal.hpp)
+	if(NOT EXISTS ${cereal_file})
+	    EXECUTE_PROCESS(COMMAND git submodule update --init external/cereal
+	                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/..
+	                    OUTPUT_QUIET
+	            )
+	endif(NOT EXISTS ${cereal_file})
+
+	file(GLOB_RECURSE hppFiles RELATIVE ${cereal_dir} "${cereal_dir}/*.(h|hpp)") # select all .hpp-files
+
+	foreach(hppFile ${hppFiles}) # copy each file
+		configure_file( "${cereal_dir}/${hppFile}" "${CMAKE_CURRENT_BINARY_DIR}/cereal/include/cereal/${hppFile}" COPYONLY )
+		install(FILES "${CMAKE_CURRENT_BINARY_DIR}/cereal/include/cereal/${hppFile}" DESTINATION external/cereal/include/cereal)
+	endforeach(hppFile)
+	MESSAGE(STATUS "Adding cereal - done")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSDSL_HAS_CEREAL=1")
+endif(SDSL_CEREAL)

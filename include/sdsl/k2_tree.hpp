@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <tuple>
 #include "sdsl/bit_vectors.hpp"
+#include "sdsl/io.hpp"
 #include "sdsl/k2_tree_helper.hpp"
 #include "sdsl/int_vector_buffer.hpp"
 
@@ -480,6 +481,30 @@ public:
 		k_t_rank.set_vector(&k_t);
 		read_member(k_k, in);
 		read_member(k_height, in);
+	}
+
+	//!\brief Serialise (save) via cereal
+	template <typename archive_t>
+	void CEREAL_SAVE_FUNCTION_NAME(archive_t & ar) const
+	{
+		ar(CEREAL_NVP(k_k));
+		ar(CEREAL_NVP(k_height));
+		ar(CEREAL_NVP(k_t));
+		ar(CEREAL_NVP(k_l));
+		ar(CEREAL_NVP(k_t_rank));
+	}
+
+	//!\brief Load via cereal
+	template <typename archive_t>
+	typename std::enable_if<cereal::traits::is_output_serializable<k2_tree, archive_t>::value, void>::type
+	CEREAL_LOAD_FUNCTION_NAME(archive_t & ar)
+	{
+		ar(CEREAL_NVP(k_k));
+		ar(CEREAL_NVP(k_height));
+		ar(CEREAL_NVP(k_t));
+		ar(CEREAL_NVP(k_l));
+		ar(CEREAL_NVP(k_t_rank));
+		k_t_rank.set_vector(&k_t);
 	}
 };
 }

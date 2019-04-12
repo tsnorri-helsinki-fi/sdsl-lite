@@ -8,7 +8,6 @@
 #ifndef INCLUDED_SDSL_RMQ_SUCCINCT_SCT
 #define INCLUDED_SDSL_RMQ_SUCCINCT_SCT
 
-#include "rmq_support.hpp"
 #include "int_vector.hpp"
 #include "bp_support_sada.hpp"
 #include "suffix_tree_helper.hpp"
@@ -148,6 +147,33 @@ public:
 	{
 		m_sct_bp.load(in);
 		m_sct_bp_support.load(in, &m_sct_bp);
+	}
+
+	template <typename archive_t>
+	void CEREAL_SAVE_FUNCTION_NAME(archive_t & ar) const
+	{
+		ar(CEREAL_NVP(m_sct_bp));
+		ar(CEREAL_NVP(m_sct_bp_support));
+	}
+
+	template <typename archive_t>
+	void CEREAL_LOAD_FUNCTION_NAME(archive_t & ar)
+	{
+		ar(CEREAL_NVP(m_sct_bp));
+		ar(CEREAL_NVP(m_sct_bp_support));
+		m_sct_bp_support.set_vector(&m_sct_bp);
+	}
+
+	//! Equality operator.
+	bool operator==(rmq_succinct_sct const & other) const noexcept
+	{
+		return (m_sct_bp == other.m_sct_bp) && (m_sct_bp_support == other.m_sct_bp_support);
+	}
+
+	//! Inequality operator.
+	bool operator!=(rmq_succinct_sct const & other) const noexcept
+	{
+		return !(*this == other);
 	}
 };
 

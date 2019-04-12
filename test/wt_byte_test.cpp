@@ -23,7 +23,36 @@ class wt_byte_test : public ::testing::Test { };
 
 using testing::Types;
 
-typedef Types<@typedef_line@> Implementations;
+#ifdef FULL_TEST_SUITE
+
+typedef Types<
+    wt_rlmn<>,
+    wt_blcd<rrr_vector<63>>,
+    wt_blcd<bit_vector_il<>>,
+    wt_blcd<bit_vector>,
+    wt_huff<bit_vector_il<>>,
+    wt_huff<bit_vector, rank_support_v<>>,
+    wt_huff<bit_vector, rank_support_v5<>>,
+    wt_huff<rrr_vector<63>>,
+    wt_rlmn<bit_vector>,
+    wt_gmr_rs<>,
+    wt_hutu<bit_vector_il<>>,
+    wt_hutu<bit_vector, rank_support_v<>>,
+    wt_hutu<bit_vector, rank_support_v5<>>,
+    wt_hutu<rrr_vector<63>>
+> Implementations;
+
+#else
+
+typedef Types<
+    wt_blcd<>,
+    wt_huff<>,
+    wt_hutu<>,
+    wt_rlmn<>,
+    wt_gmr_rs<>
+> Implementations;
+
+#endif
 
 TYPED_TEST_CASE(wt_byte_test, Implementations);
 
@@ -527,6 +556,40 @@ TYPED_TEST(wt_byte_test, create_partially_test)
     TypeParam wt(text_buf.begin(),text_buf.begin()+n);
     compare_wt(text, wt);
 }
+
+#if SDSL_HAS_CEREAL
+template <typename in_archive_t, typename out_archive_t, typename TypeParam>
+void do_serialisation(TypeParam const & l)
+{
+	{
+		std::ofstream os{temp_file, std::ios::binary};
+		out_archive_t oarchive{os};
+		oarchive(l);
+	}
+
+	{
+		TypeParam in_l{};
+		std::ifstream is{temp_file, std::ios::binary};
+		in_archive_t iarchive{is};
+		iarchive(in_l);
+		EXPECT_EQ(l, in_l);
+	}
+}
+
+TYPED_TEST(wt_byte_test, cereal)
+{
+	if (temp_dir != "@/")
+	{
+		TypeParam wt;
+	        ASSERT_TRUE(load_from_file(wt, temp_file));
+
+		do_serialisation<cereal::BinaryInputArchive,         cereal::BinaryOutputArchive>        (wt);
+		do_serialisation<cereal::PortableBinaryInputArchive, cereal::PortableBinaryOutputArchive>(wt);
+		do_serialisation<cereal::JSONInputArchive,           cereal::JSONOutputArchive>          (wt);
+		do_serialisation<cereal::XMLInputArchive,            cereal::XMLOutputArchive>           (wt);
+	}
+}
+#endif // SDSL_HAS_CEREAL
 
 TYPED_TEST(wt_byte_test, delete_)
 {

@@ -8,7 +8,6 @@
 #ifndef INCLUDED_SDSL_LCP_VLC
 #define INCLUDED_SDSL_LCP_VLC
 
-#include "lcp.hpp"
 #include "vlc_vector.hpp"
 #include "int_vector.hpp"
 #include "iterators.hpp"
@@ -100,6 +99,30 @@ public:
 
 	//! Load from a stream.
 	void load(std::istream& in) { m_vec.load(in); }
+
+	template <typename archive_t>
+	void CEREAL_SAVE_FUNCTION_NAME(archive_t & ar) const
+	{
+		ar(CEREAL_NVP(m_vec));
+	}
+
+	template <typename archive_t>
+	void CEREAL_LOAD_FUNCTION_NAME(archive_t & ar)
+	{
+		ar(CEREAL_NVP(m_vec));
+	}
+
+	//! Equality operator.
+	bool operator==(lcp_vlc const & other) const noexcept
+	{
+		return (m_vec == other.m_vec);
+	}
+
+	//! Inequality operator.
+	bool operator!=(lcp_vlc const & other) const noexcept
+	{
+		return !(*this == other);
+	}
 };
 
 } // end namespace sdsl

@@ -42,7 +42,7 @@ struct enc_vector_trait<64> {
  *  This class is a parameter of csa_sada.
  * @ingroup int_vector
  */
-template <class t_coder = coder::elias_delta, uint32_t t_dens = 128, uint8_t t_width = 0>
+template <class t_coder = coder::elias_delta<>, uint32_t t_dens = 128, uint8_t t_width = 0>
 class enc_vector {
 private:
 	static_assert(t_dens > 1, "enc_vector: sample density must be larger than `1`");
@@ -136,6 +136,12 @@ public:
 
 	//! Load the enc_vector from a stream.
 	void load(std::istream& in);
+
+	template <typename archive_t>
+	void CEREAL_SAVE_FUNCTION_NAME(archive_t & ar) const;
+
+	template <typename archive_t>
+	void CEREAL_LOAD_FUNCTION_NAME(archive_t & ar);
 
 	//! Returns the i-th sample of enc_vector
 	/*! \param i The index of the sample. 0 <= i < size()/get_sample_dens()
@@ -332,6 +338,24 @@ void enc_vector<t_coder, t_dens, t_width>::load(std::istream& in)
 	read_member(m_size, in);
 	m_z.load(in);
 	m_sample_vals_and_pointer.load(in);
+}
+
+template <class t_coder, uint32_t t_dens, uint8_t t_width>
+template <typename archive_t>
+void enc_vector<t_coder, t_dens, t_width>::CEREAL_SAVE_FUNCTION_NAME(archive_t & ar) const
+{
+	ar(CEREAL_NVP(m_size));
+	ar(CEREAL_NVP(m_z));
+	ar(CEREAL_NVP(m_sample_vals_and_pointer));
+}
+
+template <class t_coder, uint32_t t_dens, uint8_t t_width>
+template <typename archive_t>
+void enc_vector<t_coder, t_dens, t_width>::CEREAL_LOAD_FUNCTION_NAME(archive_t & ar)
+{
+	ar(CEREAL_NVP(m_size));
+	ar(CEREAL_NVP(m_z));
+	ar(CEREAL_NVP(m_sample_vals_and_pointer));
 }
 
 } // end namespace sdsl

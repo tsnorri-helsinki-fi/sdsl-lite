@@ -22,9 +22,42 @@ class bit_vector_test_bv_only : public ::testing::Test {
 
 using testing::Types;
 
-// clang-format off
-typedef Types<@typedef_line@> Implementations;
-// clang-format on
+#ifdef FULL_TEST_SUITE
+
+typedef Types<
+	bit_vector,
+	bit_vector_il<>,
+	bit_vector_il<64>,
+	bit_vector_il<128>,
+	bit_vector_il<256>,
+	bit_vector_il<1024>,
+	rrr_vector<64>,
+	rrr_vector<256>,
+	rrr_vector<129>,
+	rrr_vector<192>,
+	rrr_vector<255>,
+	rrr_vector<15>,
+	rrr_vector<31>,
+	rrr_vector<63>,
+	rrr_vector<83>,
+	rrr_vector<127>,
+	rrr_vector<128>,
+	sd_vector<>,
+	sd_vector<rrr_vector<63>>,
+	hyb_vector<>
+> Implementations;
+
+#else
+
+typedef Types<
+	bit_vector,
+	bit_vector_il<>,
+	rrr_vector<>,
+	sd_vector<>,
+	hyb_vector<>
+> Implementations;
+
+#endif
 
 typedef Types<bit_vector> Implementations_BV_Only;
 
@@ -137,7 +170,7 @@ TYPED_TEST(bit_vector_test_bv_only, and_with)
 	lfsr = LFSR_START;
 	for (size_t i = 0; i < bv1.size(); ++i) {
 		lfsr = LFSR_NEXT(lfsr);
-		ASSERT_EQ(bv2[i], bv1[i] & (lfsr & 1)) << "i=" << i << endl;
+		ASSERT_EQ((bit_vector::value_type) bv2[i], bv1[i] & (lfsr & 1)) << "i=" << i << endl;
 	}
 }
 
@@ -159,7 +192,7 @@ TYPED_TEST(bit_vector_test_bv_only, or_with)
 	lfsr = LFSR_START;
 	for (size_t i = 0; i < bv1.size(); ++i) {
 		lfsr = LFSR_NEXT(lfsr);
-		ASSERT_EQ(bv2[i], bv1[i] | (lfsr & 1)) << "i=" << i << endl;
+		ASSERT_EQ((bit_vector::value_type) bv2[i], bv1[i] | (lfsr & 1)) << "i=" << i << endl;
 	}
 }
 
@@ -181,9 +214,45 @@ TYPED_TEST(bit_vector_test_bv_only, xor_with)
 	lfsr = LFSR_START;
 	for (size_t i = 0; i < bv1.size(); ++i) {
 		lfsr = LFSR_NEXT(lfsr);
-		ASSERT_EQ(bv2[i], bv1[i] ^ (lfsr & 1)) << "i=" << i << endl;
+		ASSERT_EQ((bit_vector::value_type) bv2[i], bv1[i] ^ (lfsr & 1)) << "i=" << i << endl;
 	}
 }
+
+#if SDSL_HAS_CEREAL
+template <typename in_archive_t, typename out_archive_t, typename TypeParam>
+void do_serialisation(TypeParam const & l)
+{
+	{
+		std::ofstream os{temp_file, std::ios::binary};
+		out_archive_t oarchive{os};
+		oarchive(l);
+	}
+
+	{
+		TypeParam in_l{};
+		std::ifstream is{temp_file, std::ios::binary};
+		in_archive_t iarchive{is};
+		iarchive(in_l);
+		EXPECT_EQ(l, in_l);
+	}
+}
+
+TYPED_TEST(bit_vector_test, cereal)
+{
+	if (temp_dir != "@/")
+	{
+		bit_vector bv;
+		ASSERT_TRUE(load_from_file(bv, test_file));
+		TypeParam bv1(bv);;
+
+		do_serialisation<cereal::BinaryInputArchive,         cereal::BinaryOutputArchive>        (bv1);
+		do_serialisation<cereal::PortableBinaryInputArchive, cereal::PortableBinaryOutputArchive>(bv1);
+		do_serialisation<cereal::JSONInputArchive,           cereal::JSONOutputArchive>          (bv1);
+		do_serialisation<cereal::XMLInputArchive,            cereal::XMLOutputArchive>           (bv1);
+	}
+}
+#endif // SDSL_HAS_CEREAL
+
 
 } // end namespace
 
